@@ -4,6 +4,12 @@
 *.crt
 tls/
 
+# SSH private keys (NEVER commit these)
+id_*
+!id_*.pub
+known_hosts
+known_hosts.old
+
 # Backup files
 *.bak
 *~

@@ -8,6 +8,7 @@ Personal configuration files managed with GNU Stow, supporting multiple machines
 dotfiles/
 ├── common/                 # Shared across all machines
 │   ├── claude/            # Claude Code context file
+│   ├── ssh/               # SSH config (keys excluded)
 │   └── zsh/               # Zsh configuration
 ├── machines/
 │   └── omarchy/           # Omarchy (Arch + Hyprland)
@@ -26,7 +27,7 @@ git clone https://github.com/llkkdb/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
 # Install common configs (all machines)
-stow -d common -t ~ zsh claude
+stow -d common -t ~ zsh claude ssh
 
 # Install machine-specific configs
 stow -d machines/omarchy -t ~ hypr deskflow portals
@@ -42,12 +43,15 @@ Shared configurations that work across all machines.
 |---------|----------|--------|
 | `zsh` | `.zshrc` | `~/.zshrc` |
 | `claude` | `CLAUDE.md` | `~/CLAUDE.md` |
+| `ssh` | `.ssh/config` | `~/.ssh/config` |
+
+**Note:** SSH private keys are excluded via `.gitignore`. Only the config file is tracked.
 
 ### Install Common
 
 ```bash
 cd ~/dotfiles
-stow -d common -t ~ zsh claude
+stow -d common -t ~ zsh claude ssh
 ```
 
 ---
@@ -151,7 +155,7 @@ git push
 cd ~/dotfiles
 
 # Remove common
-stow -D -d common -t ~ zsh claude
+stow -D -d common -t ~ zsh claude ssh
 
 # Remove machine-specific
 stow -D -d machines/omarchy -t ~ hypr deskflow portals
