@@ -1,0 +1,13 @@
+# TLS/SSL certificates (sensitive)
+*.pem
+*.key
+*.crt
+tls/
+
+# Backup files
+*.bak
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
