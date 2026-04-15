@@ -64,3 +64,21 @@ rsync "${RSYNC_OPTS[@]}" "$SRC" "${DEST}/.claude/"
 echo ""
 echo "Backup complete: ${DEST}.claude/"
 du -sh "${DEST}.claude/" 2>/dev/null
+
+# Version control the important files (memory, settings, commands)
+# .gitignore excludes bulk data (session logs, file-history, etc.)
+if [[ "${1:-}" != "--dry-run" ]]; then
+    cd "$NAS_BASE"
+    if [[ -d .git ]]; then
+        git add -A
+        if ! git diff --cached --quiet; then
+            git commit -m "backup: ${MACHINE} $(date +%Y-%m-%d\ %H:%M)"
+            echo ""
+            echo "Git commit created with changes:"
+            git --no-pager diff --stat HEAD~1
+        else
+            echo ""
+            echo "No config changes to commit."
+        fi
+    fi
+fi
