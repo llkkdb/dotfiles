@@ -36,7 +36,7 @@ for pattern in "${EXCLUDES[@]}"; do
 done
 
 RSYNC_OPTS=(
-    -avh
+    -avhL
     --delete
     "${EXCLUDE_ARGS[@]}"
 )
