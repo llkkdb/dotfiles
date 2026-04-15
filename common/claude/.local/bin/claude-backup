@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# claude-backup — sync ~/.claude/ to NAS, per-machine
+# Usage: claude-backup [--dry-run]
+#
+# Backs up valuable Claude Code data (memory, settings, sessions, commands)
+# while excluding ephemeral/regenerable data (cache, debug, telemetry).
+
+set -euo pipefail
+
+NAS_BASE="/mnt/synology/Backups/claude-config"
+MACHINE="$(hostname)"
+DEST="${NAS_BASE}/${MACHINE}/"
+SRC="${HOME}/.claude/"
+
+EXCLUDES=(
+    # Ephemeral / regenerable
+    "cache/"
+    "debug/"
+    "telemetry/"
+    "statsig/"
+    "shell-snapshots/"
+    "session-env/"
+    "paste-cache/"
+    "chrome/"
+    "downloads/"
+    "mcp-needs-auth-cache.json"
+    "stats-cache.json"
+    # Credentials (don't put on NAS)
+    ".credentials.json"
+)
+
+# Build rsync exclude args
+EXCLUDE_ARGS=()
+for pattern in "${EXCLUDES[@]}"; do
+    EXCLUDE_ARGS+=(--exclude "$pattern")
+done
+
+RSYNC_OPTS=(
+    -avh
+    --delete
+    "${EXCLUDE_ARGS[@]}"
+)
+
+if [[ "${1:-}" == "--dry-run" ]]; then
+    RSYNC_OPTS+=(--dry-run)
+    echo "DRY RUN — no changes will be made"
+fi
+
+# Check NAS is mounted
+if ! mountpoint -q /mnt/synology/Backups 2>/dev/null; then
+    echo "ERROR: NAS not mounted at /mnt/synology/Backups" >&2
+    exit 1
+fi
+
+mkdir -p "$DEST"
+
+echo "Backing up Claude config: ${MACHINE}"
+echo "  Source: ${SRC}"
+echo "  Dest:   ${DEST}"
+echo ""
+
+rsync "${RSYNC_OPTS[@]}" "$SRC" "${DEST}/.claude/"
+
+echo ""
+echo "Backup complete: ${DEST}.claude/"
+du -sh "${DEST}.claude/" 2>/dev/null
